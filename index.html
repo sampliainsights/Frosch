@@ -423,38 +423,45 @@
     }
 
     .filter-bar {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.3));
+      backdrop-filter: blur(12px) saturate(180%);
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.5);
       border-radius: var(--r-full);
-      padding: 6px 6px 6px 16px;
+      padding: 6px 6px 6px 18px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       flex-wrap: wrap;
-      box-shadow: var(--shadow-xs);
+      box-shadow:
+        0 8px 32px 0 rgba(31, 38, 135, 0.05),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
       position: sticky;
       top: 64px;
       z-index: 90;
-      transition: box-shadow .2s
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .filter-bar.is-sticky {
-      box-shadow: var(--shadow-md)
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
+      border-color: rgba(255, 255, 255, 0.8);
     }
 
     .filter-label {
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: .07em;
+      letter-spacing: .1em;
       text-transform: uppercase;
       color: var(--text-tertiary);
-      white-space: nowrap
+      white-space: nowrap;
+      opacity: 0.8
     }
 
     .filter-sep {
       width: 1px;
-      height: 16px;
-      background: var(--border);
+      height: 20px;
+      background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.05), transparent);
       flex-shrink: 0
     }
 
@@ -463,22 +470,29 @@
       font-size: 12px;
       font-weight: 500;
       color: var(--text-primary);
-      background: var(--bg);
-      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: var(--r-full);
-      padding: 6px 28px 6px 12px;
+      padding: 6px 32px 6px 14px;
       appearance: none;
       outline: none;
       cursor: pointer;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238a9bb0' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 10px center;
-      transition: border-color .15s, background .15s
+      background-position: right 12px center;
+      transition: all 0.2s ease;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .filter-select:hover {
+      background-color: rgba(255, 255, 255, 0.8);
+      border-color: var(--accent-mid);
     }
 
     .filter-select:focus {
       border-color: var(--accent);
-      background-color: var(--white)
+      background-color: var(--white);
+      box-shadow: 0 0 0 4px var(--accent-light);
     }
 
     .chart-wrap {
@@ -1189,6 +1203,55 @@
         grid-template-columns: repeat(2, 1fr)
       }
     }
+
+    .glow-badge {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      padding: 10px 14px;
+      background: var(--white);
+      border: 2px solid var(--accent);
+      border-radius: var(--r-lg);
+      box-shadow: 0 0 10px var(--accent-light);
+      animation: glowPulse 10s infinite ease-in-out;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    @keyframes glowPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 5px var(--accent-light);
+        border-color: rgba(46, 125, 50, .4);
+      }
+
+      50% {
+        box-shadow: 0 0 15px var(--accent-mid);
+        border-color: var(--accent);
+        transform: scale(1.02);
+      }
+    }
+
+    .glow-badge-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      letter-spacing: .08em;
+      white-space: nowrap
+    }
+
+    .glow-badge-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1.1;
+      font-family: 'DM Mono', monospace
+    }
   </style>
 </head>
 
@@ -1430,26 +1493,35 @@
       </div>
     </div>
 
-    <!-- Q3: Valoración general -->
-    <div class="card" style="margin-bottom:12px;">
-      <div class="card-inner">
-        <div class="card-header">
-          <div class="card-label">Valoración general</div>
-          <div class="card-question">En términos generales, ¿Qué te ha parecido el producto?</div>
-        </div>
-        <div class="chart-wrap h220"><canvas id="chartValoracion"></canvas></div>
-      </div>
-    </div>
+    <!-- Q3 & Q4: Valoración general and Comparación (Side-by-side) -->
+    <div class="g2" style="margin-bottom:12px;">
+      <!-- Q3: Valoración general -->
+      <div class="card" style="position:relative;">
+        <div class="card-inner">
+          <div class="card-header">
+            <div class="card-label">Valoración general</div>
+            <div class="card-question">En términos generales, ¿Qué te ha parecido el producto?</div>
+          </div>
+          <div class="chart-wrap h220"><canvas id="chartValoracion"></canvas></div>
+          <div class="chart-note" id="mValNote" style="display:none;"></div>
 
-    <!-- Q4: Comparación con producto actual -->
-    <div class="card" style="margin-bottom:12px;">
-      <div class="card-inner">
-        <div class="card-header">
-          <div class="card-label">Comparación con producto actual</div>
-          <div class="card-question">En general, y comparado con el producto de limpieza que usas actualmente, dirías
-            que el producto Frosch que recibiste con Samplia es…</div>
+          <div id="mValTop2Box" class="glow-badge" style="display:none;">
+            <div class="glow-badge-label">Top 2 Box</div>
+            <div class="glow-badge-value" id="mValTop2Value">—</div>
+          </div>
         </div>
-        <div class="chart-wrap h220"><canvas id="chartComparacion"></canvas></div>
+      </div>
+
+      <!-- Q4: Comparación con producto actual -->
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-header">
+            <div class="card-label">Comparación con producto actual</div>
+            <div class="card-question">En general, y comparado con el producto de limpieza que usas actualmente, dirías
+              que el producto Frosch que recibiste con Samplia es…</div>
+          </div>
+          <div class="chart-wrap h220"><canvas id="chartComparacion"></canvas></div>
+        </div>
       </div>
     </div>
 
@@ -1767,7 +1839,7 @@
     // ── CONFIG ──
     const GSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkqJSDW8u4iBYfWGEfQLzmAWOruDAInAyH2thZ9slJZSNRkZfKf_niXyAJTNVCLRQuoa5OkVHEybr-/gviz/tq?tqx=out:json&gid=224864106';
     const TOTAL_SAMPLINGS = 13862;
-    const BENCH_SCORE = 7.5;
+    const BENCH_SCORE = 7.8;
     let allRows = [], allHeaders = [], charts = {};
 
     // Frosch green palette
@@ -1903,7 +1975,7 @@
       });
     }
 
-    function makeRatingBar(id, dist, max, colorFn) {
+    function makeRatingBar(id, dist, max, colorFn, horiz = false, hideY = false) {
       destroyChart(id);
       const ctx = document.getElementById(id); if (!ctx) return;
       const labels = Array.from({ length: max }, (_, i) => String(i + 1));
@@ -1915,18 +1987,24 @@
         data: { labels, datasets: [{ data: vals, backgroundColor: labels.map(l => colorFn(+l)), borderRadius: 5 }] },
         options: {
           ...CHART_DEFAULTS,
+          indexAxis: horiz ? 'y' : 'x',
           plugins: {
             ...CHART_DEFAULTS.plugins,
-            datalabels: { display: true, anchor: 'end', align: 'top', formatter: v => total > 0 && v > 0 ? Math.round(v / total * 100) + '%' : '', font: { family: "'Poppins',sans-serif", weight: 600, size: fs }, color: '#4a5568', clip: false }
+            datalabels: { display: true, anchor: 'end', align: horiz ? 'end' : 'top', formatter: v => total > 0 && v > 0 ? Math.round(v / total * 100) + '%' : '', font: { family: "'Poppins',sans-serif", weight: 600, size: fs }, color: '#4a5568', clip: false }
           },
-          layout: { padding: { top: 18 } },
+          layout: { padding: { top: !horiz ? 18 : 0, right: horiz ? 48 : 0 } },
           scales: {
-            x: { grid: { display: false }, ticks: { font: { family: "'Poppins',sans-serif", size: fs }, color: '#8a9bb0' } },
-            y: { display: false, grace: '14%' }
+            x: { display: !horiz, grid: { display: false }, ticks: { font: { family: "'Poppins',sans-serif", size: fs }, color: '#8a9bb0' } },
+            y: { display: !horiz && !hideY, grid: { display: false }, ticks: { font: { family: "'Poppins',sans-serif", size: fs }, color: '#8a9bb0' }, grace: '14%' }
           }
         },
         plugins: [ChartDataLabels]
       });
+      // Adjust scales for horiz
+      if (horiz) {
+        charts[id].options.scales.x = { display: false, grace: '18%' };
+        charts[id].options.scales.y = { display: !hideY, grid: { display: false }, ticks: { font: { family: "'Poppins',sans-serif", size: fs }, color: '#8a9bb0' } };
+      }
     }
 
     // ── RENDER ──
@@ -2004,29 +2082,89 @@
       const productoE = Object.entries(productoMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
       if (productoE.length > 0) makeBar('chartProducto', productoE.map(e => e[0]), productoE.map(e => e[1]), GREEN_PAL, true, true, false, true);
 
-      // ── Q3: Valoración general (Vertical bar) ──
-      if (scoreArr.length > 0) {
-        const scoreDist = {};
-        getCol(rows, CI.impresion).forEach(v => {
-          const n = parseFloat(v); if (!isNaN(n)) { const k = String(Math.round(n)); scoreDist[k] = (scoreDist[k] || 0) + 1; }
+      // ── Q3: Valoración general (Horizontal bar) ──
+      const valCol = CI.valoracion >= 0 ? CI.valoracion : CI.impresion;
+      const valRaw = valCol >= 0 ? getCol(rows, valCol) : [];
+      const valNumeric = valRaw.map(v => parseFloat(v)).filter(v => !isNaN(v) && v >= 1 && v <= 10);
+
+      if (valNumeric.length > 0 && valNumeric.length >= valRaw.length * 0.5) {
+        const valDist = {};
+        valNumeric.forEach(v => {
+          const k = String(Math.round(v));
+          valDist[k] = (valDist[k] || 0) + 1;
         });
-        const maxScore = Math.max(...Object.keys(scoreDist).map(Number));
-        makeRatingBar('chartValoracion', scoreDist, maxScore <= 10 ? 10 : maxScore, v => {
-          if (v <= 4) return '#e5a0a0'; if (v <= 6) return '#d0d7e0'; if (v <= 8) return '#66bb6a'; return '#2e7d32';
-        });
+        const valTotal = valNumeric.length;
+        const valAvg = valNumeric.reduce((a, b) => a + b, 0) / valNumeric.length;
+        document.getElementById('mValNote').textContent = `n=${valTotal.toLocaleString('es-ES')} · Media: ${valAvg.toFixed(1)}/10`;
+        makeRatingBar('chartValoracion', valDist, 10, v => {
+          if (v <= 4) return '#e5a0a0';
+          if (v <= 6) return '#d0d7e0';
+          if (v <= 8) return '#66bb6a';
+          return '#2e7d32';
+        }, true);
       } else {
-        // Fallback: treat as categorical
-        const valArr = CI.impresion >= 0 ? getCol(rows, CI.impresion) : [];
-        const valMap = countSingle(valArr);
-        const valE = sortedEntries(valMap, 10);
-        if (valE.length > 0) makeBar('chartValoracion', valE.map(e => e[0]), valE.map(e => e[1]), GREEN_PAL, false, true, true, false);
+        const valMap = countSingle(valRaw);
+        const order = [
+          'Mucho mejor de lo que esperaba',
+          'Algo mejor de lo que esperaba',
+          'Como lo esperaba',
+          'Peor de lo que esperaba',
+          'Mucho peor de lo que esperaba'
+        ];
+
+        const sortedLabels = order.filter(l => valMap[l] !== undefined);
+        // Add any other labels that might be in the data
+        Object.keys(valMap).forEach(l => {
+          if (!order.includes(l)) sortedLabels.push(l);
+        });
+
+        const sortedData = sortedLabels.map(l => valMap[l]);
+        const colors = sortedLabels.map(l => {
+          if (l.includes('Mucho mejor')) return '#2e7d32';
+          if (l.includes('Algo mejor')) return '#66bb6a';
+          if (l.includes('Como lo esperaba')) return '#94a3b8';
+          if (l.includes('Peor de lo que esperaba')) return '#ef4444';
+          if (l.includes('Mucho peor')) return '#7f1d1d';
+          return '#2e7d32';
+        });
+
+        // Top 2 Box Badge
+        const t2Value = (valMap['Mucho mejor de lo que esperaba'] || 0) + (valMap['Algo mejor de lo que esperaba'] || 0);
+        const t2Pct = pct(t2Value, valRaw.length);
+        const t2Box = document.getElementById('mValTop2Box');
+        if (t2Value > 0) {
+          document.getElementById('mValTop2Value').textContent = t2Pct + '%';
+          t2Box.style.display = 'flex';
+        } else {
+          t2Box.style.display = 'none';
+        }
+
+        document.getElementById('mValNote').style.display = 'none';
+        makeBar('chartValoracion', sortedLabels, sortedData, colors, true, true, false, true);
       }
 
-      // ── Q4: Comparación (Vertical bar) ──
+      // ── Q4: Comparación (Horizontal bar) ──
       const compArr = CI.comparacion >= 0 ? getCol(rows, CI.comparacion) : [];
       const compMap = countSingle(compArr);
-      const compE = sortedEntries(compMap, 8);
-      if (compE.length > 0) makeBar('chartComparacion', compE.map(e => e[0]), compE.map(e => e[1]), GREEN_PAL, false, true, true, false);
+      const compOrder = [
+        'Mucho mejor',
+        'Similar',
+        'Inferior',
+        'No he probado otros productos de limpieza'
+      ];
+      const sortedCompLabels = compOrder.filter(l => compMap[l] !== undefined);
+      Object.keys(compMap).forEach(l => { if (!compOrder.includes(l)) sortedCompLabels.push(l); });
+
+      const sortedCompData = sortedCompLabels.map(l => compMap[l]);
+      const compColors = sortedCompLabels.map(l => {
+        if (l.includes('Mucho mejor')) return '#2e7d32';
+        if (l.includes('Similar')) return '#94a3b8';
+        if (l.includes('Inferior')) return '#ef4444';
+        if (l.includes('No he probado')) return '#d0d7e0';
+        return '#2e7d32';
+      });
+
+      if (sortedCompLabels.length > 0) makeBar('chartComparacion', sortedCompLabels, sortedCompData, compColors, true, true, false, true);
 
       // ── Q5: Lo que más gustó (Leaderboard) ──
       const gustadoArr = CI.gustado >= 0 ? getCol(rows, CI.gustado) : [];
@@ -2071,7 +2209,7 @@
       });
       if (impE.length > 0) {
         if (isImpRating) {
-          makeRatingBar('chartImpresion', impMap, 10, impresionColor);
+          makeRatingBar('chartImpresion', impMap, 10, impresionColor, false, true);
         } else {
           makeBar('chartImpresion', impE.map(e => e[0]), impE.map(e => e[1]), [IMPRESION_PALETTE.negative, IMPRESION_PALETTE.neutral, '#2563eb', '#1d4ed8'], false, true, false, false);
         }
